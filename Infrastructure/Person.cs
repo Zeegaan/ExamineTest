@@ -11,5 +11,5 @@ public class Person(string firstName, string surName, string email, int age)
 
     public int Age { get; init; } = age;
     
-    public int Id { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
 }

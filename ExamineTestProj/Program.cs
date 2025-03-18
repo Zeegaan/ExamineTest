@@ -1,3 +1,4 @@
+using Examine;
 using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IPersonRepository, PersonRepository>();
+builder.Services.AddSingleton<SearchService>();
+// Adds Examine Core services
+builder.Services.AddExamine();
+
+// Create a Lucene based index
+builder.Services.AddExamineLuceneIndex("MyIndex");
 
 var app = builder.Build();
 

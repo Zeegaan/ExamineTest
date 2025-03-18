@@ -3,7 +3,6 @@
 public class PersonRepository : IPersonRepository
 {
     private List<Person> _people;
-    private int IdCount = 1;
 
     public PersonRepository()
     {
@@ -20,17 +19,15 @@ public class PersonRepository : IPersonRepository
 
     public void Create(Person person)
     {
-        person.Id = IdCount;
-        IdCount++;
         _people.Add(person);
     }
 
-    public Person? Get(int id)
+    public Person? Get(Guid id)
     {
         return _people.FirstOrDefault(x => x.Id == id);
     }
 
-    public void Delete(int id)
+    public void Delete(Guid id)
     {
         var person = Get(id);
         if (person is not null)

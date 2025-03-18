@@ -1,7 +1,7 @@
 ﻿using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExamineTestProj;
+namespace ExamineTestProj.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -21,7 +21,7 @@ public class PersonController : ControllerBase
     }
     
     [HttpGet]
-    public IActionResult ById(int id)
+    public IActionResult ById(Guid id)
     {
         return Ok(_personRepository.Get(id));
     }
@@ -34,7 +34,7 @@ public class PersonController : ControllerBase
     }
     
     [HttpDelete]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(Guid id)
     {
         _personRepository.Delete(id);
         return Ok();

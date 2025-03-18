@@ -4,6 +4,6 @@ public interface IPersonRepository
 {
     List<Person> All();
     void Create(Person person);
-    Person? Get(int id);
-    void Delete(int id);
+    Person? Get(Guid id);
+    void Delete(Guid id);
 }
