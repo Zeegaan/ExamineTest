@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExamineTestProj;
 
@@ -6,25 +7,36 @@ namespace ExamineTestProj;
 [Route("[controller]/[action]")]
 public class PersonController : ControllerBase
 {
-    private Person[] _people = {
-        new("Nikolaj", "Geisle", "nge@ubmraoc.dk", 29),
-        new("Nikolaj", "Aaaa", "nny@email.ciom", 15),
-    };
-    
+    private readonly IPersonRepository _personRepository;
+
+    public PersonController(IPersonRepository personRepository)
+    {
+        _personRepository = personRepository;
+    }
+
     [HttpGet]
     public IActionResult All()
     {
-        return Ok(_people);
+        return Ok(_personRepository.All());
     }
-}
-
-public class Person(string firstName, string surName, string email, int age)
-{
-    public string FirstName { get; init; } = firstName;
     
-    public string Surname { get; init; } = surName;
+    [HttpGet]
+    public IActionResult ById(int id)
+    {
+        return Ok(_personRepository.Get(id));
+    }
 
-    public string Email { get; init; } = email;
-
-    public int Age { get; init; } = age;
+    [HttpPost]
+    public IActionResult Create(Person person)
+    {
+        _personRepository.Create(person);
+        return Ok();
+    }
+    
+    [HttpDelete]
+    public IActionResult Delete(int id)
+    {
+        _personRepository.Delete(id);
+        return Ok();
+    }
 }
