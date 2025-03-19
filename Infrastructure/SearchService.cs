@@ -1,4 +1,6 @@
 ﻿using Examine;
+using Examine.Lucene;
+using Examine.Search;
 
 namespace Infrastructure;
 
@@ -32,7 +34,15 @@ public class SearchService
         }
     }
 
-    public List<Person> ByName(string name)
+    public long Count()
+    {
+        var index = GetIndex();
+        // Create a query
+        var queryBuilder = index.Searcher.CreateQuery("Person");
+        return queryBuilder.All().Execute().TotalItemCount;
+    }
+
+    public IEnumerable<Person> ByName(string name)
     {
         var index = GetIndex();
         
@@ -41,7 +51,47 @@ public class SearchService
             .Field("FirstName", name)
             .Execute();
 
-        return [];
+        foreach (ISearchResult result in results)
+        {
+            yield return MapToPerson(result);
+        }
+    }
+    
+    private Person MapToPerson(ISearchResult result)
+    {
+        return new Person(
+            result.Values["FirstName"],
+            result.Values["LastName"],
+            result.Values["Email"],
+            int.Parse(result.Values["Age"])
+        );
+    }
+
+    public IEnumerable<IFacetValue> GetFacets()
+    {
+        var index = GetIndex();
+        // Create a query
+        var queryBuilder = index.Searcher.CreateQuery("Person");
+        // Add facets for the price field split up into several ranges
+        var results = queryBuilder.All()
+            .WithFacets(f => f.FacetLongRange("Age", new[]
+            {
+                new Int64Range("0-9", 0, true, 9, true),
+                new Int64Range("10-19", 10, true, 19, true),
+                new Int64Range("20-29", 20, true, 29, true),
+                new Int64Range("30-39", 30, true, 39, true),
+                new Int64Range("40-49", 40, true, 49, true),
+                new Int64Range("50-59", 50, true, 59, true),
+                new Int64Range("60-69", 60, true, 69, true),
+                new Int64Range("70-79", 70, true, 79, true),
+                new Int64Range("80-89", 80, true, 89, true),
+                new Int64Range("90+", 90, true, long.MaxValue, true),
+            }))
+            .Execute();
+
+        var facets = results.GetFacets();
+
+        return results.GetFacet("Age");
     }
 
     private IIndex GetIndex()

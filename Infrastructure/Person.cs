@@ -1,15 +1,29 @@
 ﻿namespace Infrastructure;
 
 
-public class Person(string firstName, string surName, string email, int age)
+public class Person
 {
-    public string FirstName { get; init; } = firstName;
+    public Person()
+    {
+        
+    }    
+    
+    public Person(string firstName, string lastName, string email, int age)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        Age = age;
+    }
+    
+    
+    public string FirstName { get; init; }
 
-    public string Surname { get; init; } = surName;
+    public string LastName { get; init; }
 
-    public string Email { get; init; } = email;
+    public string Email { get; init; }
 
-    public int Age { get; init; } = age;
+    public int Age { get; init; }
     
     public Guid Id { get; init; } = Guid.NewGuid();
 }

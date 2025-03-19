@@ -1,4 +1,6 @@
-﻿namespace Infrastructure;
+﻿using Bogus;
+
+namespace Infrastructure;
 
 public class PersonRepository : IPersonRepository
 {
@@ -6,11 +8,15 @@ public class PersonRepository : IPersonRepository
 
     public PersonRepository()
     {
-        _people =
-        [
-            new Person("Nikolaj", "Geisle", "nge@ubmraoc.dk", 29),
-            new Person("Nikolaj", "Aaaa", "nny@email.ciom", 15)
-        ];
+        // Create a new Faker instance for a person
+        var personFaker = new Faker<Person>()
+            .RuleFor(p => p.FirstName, f => f.Name.FirstName())
+            .RuleFor(p => p.LastName, f => f.Name.LastName())
+            .RuleFor(p => p.Email, f => f.Internet.Email())
+            .RuleFor(p => p.Age, f => f.Random.Number(1, 99));
+
+        // Generate a single fake person
+        _people = personFaker.Generate(1000);
     }
     public List<Person> All()
     {
