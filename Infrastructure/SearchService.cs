@@ -9,6 +9,20 @@ public class SearchService
     private readonly IExamineManager _examineManager;
     private readonly IPersonRepository _personRepository;
 
+    private Int64Range[] _ranges = new[]
+    {
+        new Int64Range("0-9", 0, true, 9, true),
+        new Int64Range("10-19", 10, true, 19, true),
+        new Int64Range("20-29", 20, true, 29, true),
+        new Int64Range("30-39", 30, true, 39, true),
+        new Int64Range("40-49", 40, true, 49, true),
+        new Int64Range("50-59", 50, true, 59, true),
+        new Int64Range("60-69", 60, true, 69, true),
+        new Int64Range("70-79", 70, true, 79, true),
+        new Int64Range("80-89", 80, true, 89, true),
+        new Int64Range("90+", 90, true, long.MaxValue, true),
+    };
+
     public SearchService(IExamineManager examineManager, IPersonRepository personRepository)
     {
         _examineManager = examineManager;
@@ -33,13 +47,19 @@ public class SearchService
                 }));
         }
     }
-
-    public long Count()
+    
+    public ISearchResults Search(string[]? labels = null)
     {
         var index = GetIndex();
         // Create a query
         var queryBuilder = index.Searcher.CreateQuery("Person");
-        return queryBuilder.All().Execute().TotalItemCount;
+
+        var rangesToSearch = labels is null ? _ranges : _ranges.Where(x => labels.Contains(x.Label)).ToArray();
+        var results = queryBuilder.All()
+            .WithFacets(f => f.FacetLongRange("Age", rangesToSearch))
+            .Execute();
+
+        return results;
     }
 
     public IEnumerable<Person> ByName(string name)
@@ -69,27 +89,24 @@ public class SearchService
 
     public IEnumerable<IFacetValue> GetFacets()
     {
+        return SearchWithFacets();
+    }
+    
+    public IEnumerable<IFacetValue> SelectFacets(string[] labels)
+    {
+        return SearchWithFacets(labels);
+    }
+
+    private IFacetResult SearchWithFacets(string[]? labels = null)
+    {
         var index = GetIndex();
         // Create a query
         var queryBuilder = index.Searcher.CreateQuery("Person");
-        // Add facets for the price field split up into several ranges
-        var results = queryBuilder.All()
-            .WithFacets(f => f.FacetLongRange("Age", new[]
-            {
-                new Int64Range("0-9", 0, true, 9, true),
-                new Int64Range("10-19", 10, true, 19, true),
-                new Int64Range("20-29", 20, true, 29, true),
-                new Int64Range("30-39", 30, true, 39, true),
-                new Int64Range("40-49", 40, true, 49, true),
-                new Int64Range("50-59", 50, true, 59, true),
-                new Int64Range("60-69", 60, true, 69, true),
-                new Int64Range("70-79", 70, true, 79, true),
-                new Int64Range("80-89", 80, true, 89, true),
-                new Int64Range("90+", 90, true, long.MaxValue, true),
-            }))
-            .Execute();
 
-        var facets = results.GetFacets();
+        var rangesToSearch = labels is null ? _ranges : _ranges.Where(x => labels.Contains(x.Label)).ToArray();
+        var results = queryBuilder.All()
+            .WithFacets(f => f.FacetLongRange("Age", rangesToSearch))
+            .Execute();
 
         return results.GetFacet("Age");
     }
