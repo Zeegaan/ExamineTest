@@ -29,7 +29,7 @@ public class SearchController : ControllerBase
     {
         var searchResults = _searchService.Search(labels);
         
-        return Ok(MapToSearchViewModel(searchResults));
+        return Ok(MapToSearchViewModel(searchResults, labels));
     }
 
 
@@ -44,18 +44,6 @@ public class SearchController : ControllerBase
         }
         return Ok(viewModels);
     }
-
-    [HttpGet]
-    public IActionResult SelectFacets(string[] labels)
-    {
-        var facets = _searchService.SelectFacets(labels);
-        var viewModels = new List<FacetViewModel>();
-        foreach (var facet in facets)
-        {
-            viewModels.Add(new FacetViewModel { Label = facet.Label, Count = facet.Value });
-        }
-        return Ok(viewModels);
-    }
     
     
     private SearchViewModel MapToSearchViewModel(ISearchResults results, string[]? labels)
@@ -63,10 +51,11 @@ public class SearchController : ControllerBase
         var facetResult = results.GetFacet("Age");
 
         var facets = new List<IFacetValue>();
-        foreach (var label in labels)
+        if (facetResult is not null && labels is not null)
         {
-            facets.Add(facetResult.Facet(label));
+            facets.AddRange(labels.Select(label => facetResult.Facet(label)));
         }
+
         
         return new SearchViewModel
         {

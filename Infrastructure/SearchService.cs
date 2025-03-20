@@ -53,11 +53,37 @@ public class SearchService
         var index = GetIndex();
         // Create a query
         var queryBuilder = index.Searcher.CreateQuery("Person");
-
         var rangesToSearch = labels is null ? _ranges : _ranges.Where(x => labels.Contains(x.Label)).ToArray();
-        var results = queryBuilder.All()
-            .WithFacets(f => f.FacetLongRange("Age", rangesToSearch))
-            .Execute();
+
+        IOrdering query;
+        if (labels != null)
+        {
+            query = queryBuilder
+                .Group(x =>
+                {
+                    var intRange = _ranges.First(x => x.Label == labels[0]);
+                    // Start with a range query for first duration range.
+                    var inner = x.RangeQuery<int>(new[] { "Age" }, (int)intRange.Min, (int)intRange.Max);
+
+                    // Add range queries for next duration ranges.
+                    foreach (var label in labels.Skip(1))
+                    {
+                        var range = _ranges.First(x => x.Label == label);
+                        inner.Or().RangeQuery<int>(new[] { "Age" },
+                            (int)range.Min,
+                            (int) range.Max);
+                    }
+
+                    return inner;
+                });
+
+        }
+        else
+        {
+            query = queryBuilder.All();
+        }
+
+        var results = query.WithFacets(f => f.FacetLongRange("Age", rangesToSearch)).Execute();
 
         return results;
     }
