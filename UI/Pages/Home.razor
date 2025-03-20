@@ -13,30 +13,39 @@
 }
 else
 {
-    <h1>People</h1>
-    <h2>Total number of people: @_searchViewModel.TotalCount --- People selected: @_searchViewModel.PeopleCount</h2>
-
-    <table class="table">
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Age</th>
-            <th>Email</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var person in _searchViewModel.People)
+    <div class="sidebar">
+        @foreach (var facet in _searchViewModel.Facets)
         {
+            <p>@facet.Label: @facet.Count</p>
+        }
+    </div>
+    <div class="main">
+        <h1>People</h1>
+        <h2>Total number of people: @_searchViewModel.TotalCount --- People selected: @_searchViewModel.PeopleCount</h2>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var person in _searchViewModel.People)
+            {
             <tr>
                 <td>@person.FirstName</td>
                 <td>@person.LastName</td>
                 <td>@person.Age</td>
                 <td>@person.Email</td>
             </tr>
-        }
-        </tbody>
-    </table>
+            }
+            </tbody>
+        </table>
+    </div>
+    
 }
 
 @code {
