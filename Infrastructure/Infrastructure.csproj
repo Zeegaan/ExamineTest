@@ -11,4 +11,8 @@
       <PackageReference Include="Examine" Version="4.0.0-beta.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
+
 </Project>

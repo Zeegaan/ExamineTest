@@ -1,4 +1,5 @@
-﻿using Examine;
+﻿using Core;
+using Examine;
 using Examine.Lucene;
 using Examine.Search;
 using Infrastructure;
@@ -28,8 +29,10 @@ public class SearchController : ControllerBase
     public IActionResult Search(string[]? labels = null)
     {
         var searchResults = _searchService.Search(labels);
+
+        var viewModel = MapToSearchViewModel(searchResults, labels);
         
-        return Ok(MapToSearchViewModel(searchResults, labels));
+        return Ok(viewModel);
     }
 
 
@@ -82,22 +85,5 @@ public class SearchController : ControllerBase
             result.Values["Email"],
             int.Parse(result.Values["Age"])
         );
-    }
-    
-    
-    public class SearchViewModel
-    {
-        public long PeopleCount => People.Count;
-        public long TotalCount { get; set; }
-        
-        public List<FacetViewModel> Facets { get; set; }
-        public List<Person> People { get; set; }
-
-    }
-
-    public class FacetViewModel
-    {
-        public string Label { get; set; }
-        public float Count { get; set; }
     }
 }

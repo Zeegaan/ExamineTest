@@ -10,6 +10,15 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IPersonRepository, PersonRepository>();
 builder.Services.AddSingleton<SearchService>();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7044",
+                "http://localhost:5047");
+        });
+});
 // Adds Examine Core services
 builder.Services.AddExamine();
 
@@ -27,5 +36,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseCors();
 
 app.Run();

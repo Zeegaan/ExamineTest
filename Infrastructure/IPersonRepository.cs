@@ -1,4 +1,6 @@
-﻿namespace Infrastructure;
+﻿using Core;
+
+namespace Infrastructure;
 
 public interface IPersonRepository
 {

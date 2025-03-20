@@ -1,4 +1,5 @@
-﻿using Examine;
+﻿using Core;
+using Examine;
 using Examine.Lucene;
 using Examine.Search;
 

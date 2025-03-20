@@ -4,12 +4,12 @@ namespace Infrastructure;
 
 public class PersonRepository : IPersonRepository
 {
-    private List<Person> _people;
+    private List<Core.Person> _people;
 
     public PersonRepository()
     {
         // Create a new Faker instance for a person
-        var personFaker = new Faker<Person>()
+        var personFaker = new Faker<Core.Person>()
             .RuleFor(p => p.FirstName, f => f.Name.FirstName())
             .RuleFor(p => p.LastName, f => f.Name.LastName())
             .RuleFor(p => p.Email, f => f.Internet.Email())
@@ -18,17 +18,17 @@ public class PersonRepository : IPersonRepository
         // Generate a single fake person
         _people = personFaker.Generate(1000);
     }
-    public List<Person> All()
+    public List<Core.Person> All()
     {
         return _people;
     }
 
-    public void Create(Person person)
+    public void Create(Core.Person person)
     {
         _people.Add(person);
     }
 
-    public Person? Get(Guid id)
+    public Core.Person? Get(Guid id)
     {
         return _people.FirstOrDefault(x => x.Id == id);
     }

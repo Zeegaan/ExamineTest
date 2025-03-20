@@ -1,5 +1,4 @@
-﻿namespace Infrastructure;
-
+﻿namespace Core;
 
 public class Person
 {

@@ -1,0 +1,58 @@
+﻿@page "/"
+@using System.Text.Json
+@using Core
+@inject HttpClient Http
+
+<PageTitle>Home</PageTitle>
+
+@if (_searchViewModel == null)
+{
+<p>
+    <em>Loading...</em>
+</p>
+}
+else
+{
+    <h1>People</h1>
+    <h2>Total number of people: @_searchViewModel.TotalCount --- People selected: @_searchViewModel.PeopleCount</h2>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var person in _searchViewModel.People)
+        {
+            <tr>
+                <td>@person.FirstName</td>
+                <td>@person.LastName</td>
+                <td>@person.Age</td>
+                <td>@person.Email</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private SearchViewModel? _searchViewModel;
+    protected override async Task OnInitializedAsync()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "search/search");
+
+        var response = await Http.SendAsync(request);
+        
+        using var responseStream = await response.Content.ReadAsStreamAsync();
+        _searchViewModel = await JsonSerializer.DeserializeAsync<SearchViewModel>(responseStream);
+        
+        _searchViewModel = await Http.GetFromJsonAsync<SearchViewModel>("search/search");
+        string something = "";
+    }
+
+}
