@@ -48,17 +48,22 @@ public class SearchService
         }
     }
     
-    public ISearchResults Search(string[]? labels = null)
+    public ISearchResults Search(string[]? labels = null, string? name = null)
     {
         var index = GetIndex();
         // Create a query
         var queryBuilder = index.Searcher.CreateQuery("Person");
-        var rangesToSearch = labels is null ? _ranges : _ranges.Where(x => labels.Contains(x.Label)).ToArray();
+        if (name is not null)
+        {
+           queryBuilder.Field("Name", name);
+        }
 
         IOrdering query;
         if (labels != null)
         {
             query = queryBuilder
+                .Field("Name", name ?? "*")
+                .And()
                 .Group(x =>
                 {
                     var intRange = _ranges.First(x => x.Label == labels[0]);
@@ -83,7 +88,7 @@ public class SearchService
             query = queryBuilder.All();
         }
 
-        var results = query.WithFacets(f => f.FacetLongRange("Age", rangesToSearch)).Execute();
+        var results = query.WithFacets(f => f.FacetLongRange("Age", _ranges)).Execute();
 
         return results;
     }
